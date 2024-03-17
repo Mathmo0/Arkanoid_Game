@@ -3,15 +3,16 @@ import BLUE_BRICK_IMAGE from './images/bleu.png';
 import GREEN_BRICK_IMAGE from './images/vert.png';
 import YELLOW_BRICK_IMAGE from './images/jaune.png';
 import PURPLE_BRICK_IMAGE from './images/rose.png';
+import GREY_BRICK_IMAGE from './images/gris.png';
 
 // Grab the canvas element for calculating the brick width
 // depending on canvas width
-const canvas: HTMLCanvasElement | null = document.querySelector('#playField');
+const canvas: HTMLCanvasElement | null = document.querySelector('#playField');
 
 // Constants
 export const STAGE_PADDING = 10;
 export const STAGE_ROWS = 20;
-export const STAGE_COLS = 10;
+export const STAGE_COLS = 11;
 export const BRICK_PADDING = 5;
 // On adapte la taille des bricks en fonction de la taille du canvas
 export const BRICK_WIDTH = canvas
@@ -31,6 +32,7 @@ export const BALL_STARTX = 500;
 export const BALL_STARTY = 400;
 
 export const BRICK_IMAGES: { [key: number]: string } = {
+  0: GREY_BRICK_IMAGE,
   1: RED_BRICK_IMAGE,
   2: GREEN_BRICK_IMAGE,
   3: YELLOW_BRICK_IMAGE,
@@ -39,6 +41,7 @@ export const BRICK_IMAGES: { [key: number]: string } = {
 };
 
 export const BRICK_ENERGY: { [key: number]: number } = {
+  0: 1,
   1: 1, // Red brick
   2: 1, // Green brick
   3: 2, // Yellow brick
@@ -46,12 +49,46 @@ export const BRICK_ENERGY: { [key: number]: number } = {
   5: 3 // pink brick
 };
 
+// 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+//   0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 
+//   0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 
+//   0, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0,
+//   0, 0, 4, 4, 4, 4, 4, 4, 0, 0, 0, 
+//   0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 0, 
+//   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+//   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+//   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+//   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+//   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+//   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+
 // prettier-ignore
-export const LEVEL = [
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 1, 1, 1, 1, 1, 1, 0, 0,
-  0, 2, 2, 2, 2, 2, 2, 2, 2, 0,
-  0, 3, 3, 3, 3, 3, 3, 3, 3, 0,
-  0, 0, 4, 4, 4, 4, 4, 4, 0, 0, 
-  0, 0, 5, 5, 0, 0, 5, 5, 0, 0,
+export let LEVEL = [
+  0, 0, 0, 0, 5, 0, 5, 0, 0, 0, 0,
+  0, 0, 0, 5, 5, 5, 5, 5, 0, 0, 0, 
+  0, 0, 5, 5, 5, 5, 5, 5, 5, 0, 0, 
+  0, 0, 5, 4, 4, 5, 4, 4, 5, 0, 0,
+  0, 0, 5, 3, 4, 5, 3, 4, 5, 0, 0, 
+  0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 
+  0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0,
+  0, 5, 0, 5, 0, 0, 0, 5, 0, 5, 0,
+  0, 5, 0, 0, 5, 0, 5, 0, 0, 5, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+];
+
+export let EMPTY_LEVEL = [
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 ];

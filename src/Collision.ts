@@ -3,6 +3,7 @@ import { Brick } from "./sprites/Brick";
 import { Paddle } from "./sprites/Paddle";
 import { Ball } from "./sprites/Ball";
 import { CanvasView } from "./View/CanvasView";
+import { BRICK_IMAGES } from "./setup"
 
 export class Collision{
 
@@ -30,11 +31,19 @@ export class Collision{
                     bricks.splice(i, 1);
                 } else {
                     brick.energy -= 1;
+                    var i = 0;
+                    for(i; i <= 5; i++){
+                        if (BRICK_IMAGES[i].split('/').pop() == brick.image.src.split('/').pop()){
+                            break;
+                        }
+                    }
+                    i--;
+                    brick.image.src = BRICK_IMAGES[i < 0 ? 0 : i];
                 }
                 colliding = true;
             }
         });
-        
+         
         return colliding;
     }
 

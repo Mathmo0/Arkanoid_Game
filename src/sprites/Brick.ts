@@ -1,4 +1,5 @@
 import { Vector } from "../types";
+import { BRICK_ENERGY } from "../setup"
 
 export class Brick {
     private brickImage: HTMLImageElement = new Image();
@@ -41,5 +42,21 @@ export class Brick {
     // set
     set energy(energy: number) {
         this.brickEnergy = energy;
+    }
+
+    addClickEvent(clickEvent: boolean) {
+        if (clickEvent) {
+            this.brickImage?.addEventListener('click', () => {
+                if(this.brickEnergy < BRICK_ENERGY[-1])
+                    this.brickEnergy += 1;
+                else
+                    this.brickEnergy = 0;
+            });
+        }
+        else {
+            this.brickImage?.addEventListener('click', () => {
+
+            });
+        }
     }
 }

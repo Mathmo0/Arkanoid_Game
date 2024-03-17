@@ -17,23 +17,29 @@ import {
     BALL_SPEED,
     BALL_SIZE,
     BALL_STARTX,
-    BALL_STARTY
+    BALL_STARTY,
+    BRICK_ENERGY, 
+    BRICK_IMAGES,
 } from './setup';
 
 // helpers
-import { createBricks } from "./helpers";
+import { createBrickEditLevel, createBricks, createEmptyBrickLevel } from "./helpers";
 
 let gameOver = false;
 let score = 0;
+let brickGlobal = [] as Brick[];
+let brickGlobalCopy = [] as Brick[];
 
 function setGameOver(view: CanvasView) {
     view.drawInfo('GAME OVER !');
     gameOver = false;
+    brickGlobal = brickGlobalCopy;
 }
 
 function setGameWin(view: CanvasView) {
     view.drawInfo('GAME WON !');
     gameOver = false;
+    brickGlobal = brickGlobalCopy;
 }
 
 function gameLoop(
@@ -80,15 +86,28 @@ function gameLoop(
     requestAnimationFrame(() => gameLoop(view, bricks, paddle, ball, collision));
 }
 
+function delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+}
+
 function startGame(view: CanvasView) {
     // reset display
     score = 0;
     view.drawInfo('');
     view.drawScore(0);
+    view.showChangeSize(false);
+    view.canvas.removeEventListener('click', onClickCanvasEdit);
     // create collision instance
     const collision = new Collision();
     // create all bricks
-    const bricks = createBricks();
+    if (brickGlobal.length != 0){
+        brickGlobal = brickGlobal.filter((elmt) => elmt.image.src.split('/').pop() !== BRICK_IMAGES[0].split('/').pop());
+        brickGlobalCopy = brickGlobal.filter((elmt) => elmt.image.src.split('/').pop() !== BRICK_IMAGES[0].split('/').pop());
+    }
+    else{
+        brickGlobal = createBricks();
+        brickGlobalCopy = createBricks();
+    }
     // create ball
     const ball = new Ball(
         BALL_SPEED,
@@ -111,9 +130,66 @@ function startGame(view: CanvasView) {
         PADDLE_IMAGE
     );
 
-    gameLoop(view, bricks, paddle, ball, collision);
+    gameLoop(view, brickGlobal, paddle, ball, collision);
+}
+
+function editLevel(view: CanvasView) {
+    view.showChangeSize(true);
+    // reset display
+    score = 0;
+    view.drawInfo('');
+    // create all bricks
+    brickGlobal = createBrickEditLevel();
+    brickGlobal.forEach(element => {
+        element.image.addEventListener('click', () => {
+            if(element.energy < 5)
+                element.energy += 1;
+            else
+                element.energy = 0;
+            view.clear();
+            view.drawBrick(brickGlobal);
+        });
+    });
+    view.canvas.addEventListener('click', onClickCanvasEdit);
+    view.clear();
+    view.drawBrick(brickGlobal);
+}
+
+function onClickCanvasEdit(event: MouseEvent){
+    var x = event.pageX - (view.canvas.offsetLeft + view.canvas.clientLeft);
+    var y = event.pageY - (view.canvas.offsetTop + view.canvas.clientTop);
+    brickGlobal.forEach((elmt) => {
+        if (y > elmt.pos.y && y < elmt.pos.y + elmt.height && x > elmt.pos.x && x < elmt.pos.x + elmt.width){ 
+            if (elmt.image.src.split('/').pop() != BRICK_IMAGES[5].split('/').pop()){
+                var i = 0;
+                for(i; i <= 5; i++){
+                    if (BRICK_IMAGES[i].split('/').pop() == elmt.image.src.split('/').pop()){
+                        break;
+                    }
+                }
+                i++;
+                elmt.energy = BRICK_ENERGY[i > 5 ? 0 : i];
+                elmt.image.src = BRICK_IMAGES[i > 5 ? 0 : i];
+            }
+            else {
+                elmt.energy = BRICK_ENERGY[0];
+                elmt.image.src = BRICK_IMAGES[0]
+            }
+        }
+    });
+    view.clear();
+    view.drawBrick(brickGlobal);
+    event.stopImmediatePropagation();
+}
+
+function clearBricks(view: CanvasView) {
+    brickGlobal = createEmptyBrickLevel();
+    view.clear();
+    view.drawBrick(brickGlobal);
 }
 
 // Create a new view
 const view = new CanvasView('#playField');
 view.initStartButton(startGame);
+view.initEditButton(editLevel);
+view.initChangeSizeButton(clearBricks);
